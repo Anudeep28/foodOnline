@@ -5,7 +5,7 @@ from .models import User
 from django.contrib import messages
 # Create your views here.
 
-def userRegister(request):
+def userRegisterView(request):
     #form = CustomUserForm()
     # to check if it is post or not
     if request.method == "POST":
@@ -59,4 +59,6 @@ def userRegister(request):
     
     return render(request, 
                   'accounts/userRegister.html',
-                  context) 
+                  context)
+
+

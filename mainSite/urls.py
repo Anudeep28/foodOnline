@@ -25,6 +25,7 @@ urlpatterns = [
 
     #App
     path('accounts/', include('accounts.urls', namespace='accounts')),
+    path('vendor/', include('vendor.urls', namespace='vendor')),
 
     # Home page of the app
     path('', views.HomePageView, name='home')
