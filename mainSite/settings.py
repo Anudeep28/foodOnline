@@ -148,3 +148,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
+
+
+
+
+
+
+
+
+# Email Configuration in django very important
+EMAIL_HOST=config('EMAIL_HOST')#'smtp.outlook.com'
+EMAIL_PORT=config('EMAIL_PORT', cast=int)#587
+EMAIL_HOST_USER=config('EMAIL_HOST_USER') #'eneru_solutions@outlook.com'
+EMAIL_HOST_PASSWORD=config('EMAIL_HOST_PASSWORD')  #'tdiwtegtwpvnefqd'
+EMAIL_USE_TLS=True
+EMAIL_BACKEND=config('EMAIL_BACKEND') #'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Eneru Technologies <eneru_solutions@outlook.com>'

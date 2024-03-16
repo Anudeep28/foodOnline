@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.contrib import messages
 from accounts.forms import CustomUserForm
 from accounts.models import User, UserProfile
+from accounts.utils import send_verification_email
 from vendor.forms import VendorForm
 
 # Create your views here.
@@ -35,6 +36,13 @@ def vendorRegisterView(request):
             user_profile = UserProfile.objects.get(user=user)
             vendor.user_profile = user_profile
             vendor.save()
+            # After Saving the user the user should receive the
+            # verification email to activate the account fromt he company
+            mail_subject="Please activate your account"
+            email_template_url='accounts/emails/account_verification_email.html'
+            send_verification_email(request, user, mail_subject, email_template_url)
+
+            
             messages.success(request, "Your Restaurant has been registered !!")
             return redirect('vendor:vendorRegister')
         else:
