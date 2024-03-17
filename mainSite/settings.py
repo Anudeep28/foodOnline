@@ -71,7 +71,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # To add our own context for all html pages
-                'accounts.context_processors.get_restaurant'
+                'accounts.context_processors.get_restaurant',
+                # this is for Google api key
+                'accounts.context_processors.get_google_api_key',
             ],
         },
     },
@@ -164,3 +166,7 @@ EMAIL_HOST_PASSWORD=config('EMAIL_HOST_PASSWORD')  #'tdiwtegtwpvnefqd'
 EMAIL_USE_TLS=True
 EMAIL_BACKEND=config('EMAIL_BACKEND') #'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')#'Eneru Technologies <eneru_solutions@outlook.com>'
+
+
+# Adding Google maps api keys
+GOOGLE_API_KEY=config('GOOGLE_API_KEY')
