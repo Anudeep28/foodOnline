@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from accounts.decorators import check_customer_access, check_restaurant_access
 from accounts.utils import detectUser, send_verification_email
+from vendor.models import Vendor
 from .forms import CustomUserForm
 from .models import User
 # Messages
@@ -143,7 +144,7 @@ def cusDashboard(request):
 @login_required(login_url='accounts:userLogin')
 @user_passes_test(check_restaurant_access)
 def restaurantDashboard(request):
-    return render(request, 'accounts/restaurantDashboard.html')
+    return render(request, 'vendor/restaurantDashboard.html')
 
 
 

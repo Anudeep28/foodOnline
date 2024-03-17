@@ -72,7 +72,7 @@
 							<div class="login-option">
 								{% if user.is_authenticated %}
 								<a href="{% url 'accounts:accountDecider' %}" class="cs-color cs-popup-joinus-btn login-popup" data-toggle="modal" href="">
-									My Account
+									Welcome {{user.first_name}}
 								</a>
 								<a href="{% url 'accounts:userLogout' %}" class="cs-color cs-popup-joinus-btn login-popup text-danger" data-toggle="modal" href="">Logout
 								</a>

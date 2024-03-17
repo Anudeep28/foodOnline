@@ -1,0 +1,16 @@
+{% autoescape off %}
+
+Hi {{user.first_name}},
+
+{% if is_approved %}
+    Congratulations! Your Restaurant has been approved by our admin panel!.
+{% else %}
+    We are really Sorry! Your Restaurant has not been approved by out admin panel!.
+    Please contact us on our email address : eneru_solutions@outlook.com.
+    We will get back to you as soon as possible!
+
+    Regards,
+    Eneru Technologies (opc)
+{% endif %}
+
+{% endautoescape %}

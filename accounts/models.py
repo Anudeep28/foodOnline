@@ -116,6 +116,9 @@ class UserProfile(models.Model):
     def __str__(self) -> str:
         return self.user.first_name
     
+    # to get the full adress\
+    def full_address(self):
+        return f"{self.address_line_1}, {self.address_line_2}"
 
         #profile.save()
 # We also use the decorator to connect the post save and function

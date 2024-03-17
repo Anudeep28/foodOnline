@@ -56,3 +56,7 @@ def vendorRegisterView(request):
         "vendor_form":vendor_form
     }
     return render(request, 'vendor/vendorRegister.html', context)
+
+
+def restaurantProfile(request):
+    return render(request, 'vendor/restaurantProfile.html')

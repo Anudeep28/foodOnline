@@ -28,7 +28,8 @@ def send_verification_email(request, user, mail_subject, email_template_url):
     current_site = get_current_site(request)
 
     #mail_subject = "Please activate your account"
-    message = render_to_string(email_template_url,{
+    message = render_to_string(email_template_url,
+                               {
         'user':user,
         'domain':current_site,
         # encoded version of users primary key send to the ussr
@@ -38,9 +39,24 @@ def send_verification_email(request, user, mail_subject, email_template_url):
     })
 
     to_email = user.email
-    mail = EmailMessage(mail_subject,message,from_email=settings.EMAIL_HOST_USER,to=[to_email])
+    mail = EmailMessage(mail_subject, 
+                        message, 
+                        from_email=settings.DEFAULT_FROM_EMAIL, 
+                        to=[to_email])
     mail.send()
 
+
+# Sending notification function
+def send_notification(mail_subject, email_template_url, context):
+    message = render_to_string(email_template_url, context)
+
+    to_email = context['user'].email
+
+    mail = EmailMessage(mail_subject, 
+                        message, 
+                        from_email=settings.DEFAULT_FROM_EMAIL, 
+                        to=[to_email])
+    mail.send()
 # Sending email function for registered user
 # def send_password_reset(request, user):
     
