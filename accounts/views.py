@@ -24,7 +24,7 @@ def userRegisterView(request):
     # to avoid again logging in by the user
     if request.user.is_authenticated:
         messages.warning(request, "You are already logged in !")
-        return redirect('accounts:dashboard')
+        return redirect('accounts:accountDecider')
     
     #form = CustomUserForm()
     # to check if it is post or not

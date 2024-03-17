@@ -1,12 +1,22 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
-from accounts.forms import CustomUserForm
+from accounts.decorators import check_restaurant_access
+from accounts.forms import CustomUserForm, UserProfileForm
 from accounts.models import User, UserProfile
 from accounts.utils import send_verification_email
 from vendor.forms import VendorForm
+from vendor.models import Vendor
+# decorator
+from django.contrib.auth.decorators import login_required, user_passes_test
+
 
 # Create your views here.
+
+
 def vendorRegisterView(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "You are already logged in !")
+        return redirect('accounts:accountDecider')
 
     if request.method == 'POST':
         # store the Data and create the user and vendor
@@ -57,6 +67,31 @@ def vendorRegisterView(request):
     }
     return render(request, 'vendor/vendorRegister.html', context)
 
-
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
 def restaurantProfile(request):
-    return render(request, 'vendor/restaurantProfile.html')
+    profile = get_object_or_404(UserProfile, user=request.user)
+    vendor = get_object_or_404(Vendor, user=request.user)
+
+    # if the user updates the information
+    if request.method == 'POST':
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        restaurant_form = VendorForm(request.POST, request.FILES, instance=vendor)
+        if profile_form.is_valid() and restaurant_form.is_valid():
+            profile_form.save()
+            restaurant_form.save()
+            messages.success(request, "Updated successfully!")
+            return redirect('vendor:restaurantProfile')
+        else:
+            messages.error(request, "Found Some errors")
+    else:
+        profile_form = UserProfileForm(instance=profile)
+        restaurant_form = VendorForm(instance=vendor)
+
+    context = {
+        "profile_form":profile_form,
+        "restaurant_form":restaurant_form,
+        "profile":profile,
+        "vendor":vendor
+    }
+    return render(request, 'vendor/restaurantProfile.html', context)

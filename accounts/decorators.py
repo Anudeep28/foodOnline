@@ -7,9 +7,7 @@ def check_customer_access(user):
     else:
         raise PermissionDenied
     
-    
-    
-    
+
 def check_restaurant_access(user):    
     if user.get_role() == 'restaurant':
         return True
