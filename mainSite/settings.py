@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Apps
     'accounts',
     'vendor',
+    'menu',
 ]
 
 MIDDLEWARE = [

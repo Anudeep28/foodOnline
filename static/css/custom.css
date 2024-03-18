@@ -4,6 +4,7 @@
     80% {bottom: 200px}
     100% {bottom: -50px}
 }
+
 .show-notification{
     position: fixed;
     bottom: 100%; /* Center vertically */
@@ -15,8 +16,9 @@
     animation-duration: 5s;
     z-index: 99;
 }
-.btn.btn-info{
+
+.btn{
     padding: 2px 1.75em;
-    font-size: 12px;
+    font-size: 0.75em;
     cursor: pointer;
 }

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Restaurant_Menu
+{% endblock title %}
+
+{% block content %}
+		<!-- Main Section Start -->
+		<div class="main-section">
+			{% include 'includes/restaurant_coverpage.html' %}
+			<div class="page-section account-header buyer-logged-in">
+				<div class="container">
+					<div class="row">
+						<!--Load Sidebar of restaurant-->
+						{% include 'includes/ven_sidebar.html' %}
+						<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+							<div class="user-dashboard loader-holder">
+								<div class="user-holder">
+									
+									<h5 class="text-uppercase">Build your Food Menu</h5>
+									<!-- My Restaurants Form Start -->
+                                    <hr>
+                                    
+                                    <h6>Menu Categories</h6>
+                                    <a href="#" style="font-size: 0.75em;" class="btn btn-success float-right m-1" ><i class='fa fa-plus mr-1' aria-hidden="true"></i>Add Food Item</a>
+                                    <a href="{% url 'vendor:addCategory' %}" style="font-size: 0.75em;" class="btn btn-info float-right m-1" ><i class='fa fa-plus mr-1' aria-hidden="true"></i>Add Food Categories</a>
+                                    <table class="table table-hover table-borderless">
+                                        
+                                        <tbody>
+                                            {% for cat in categories %}
+                                          <tr>
+                                            <td class="text-left">{{forloop.counter}}</t>
+                                            <td class="text-left">
+                                                <a href="{% url 'vendor:menuBuilderCategory' cat.pk %}" >
+                                                    <p class="mob-0 font-weight-bold" >
+                                                        {{cat.category_name}}
+                                                    </p>
+                                                    <small class="text-muted">
+                                                        {{cat.description}}
+                                                    </small>
+                                                
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'vendor:editCategory' cat.pk %}" >
+                                                    <i class='fa fa-pencil mr-1' aria-hidden="true">                                                    
+                                                    </i>
+                                                </a>
+                                                &nbsp;
+                                                <a href="{% url 'vendor:deleteCategory' cat.pk %}" onclick="return confirm('Are you sure you want to delete this category?')" >
+                                                    <i class='fa fa-trash ml-1 text-danger' aria-hidden="true">                                                    
+                                                    </i>
+                                                </a>
+                                                
+                                            </td>
+                                          </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                      </table>
+									<!-- My Restaurants Form End -->
+									<hr>
+                                    <button class="btn btn-secondary" onclick="history.back()" ><i class='fa fa-angle-left mr-1' aria-hidden="true"></i>Back</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Main Section End -->
+{% include 'includes/alerts.html' %}
+{% endblock %}
