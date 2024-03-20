@@ -4,7 +4,7 @@ from accounts.decorators import check_restaurant_access
 from accounts.forms import CustomUserForm, UserProfileForm
 from accounts.models import User, UserProfile
 from accounts.utils import send_verification_email
-from menu.forms import CategoryModelForm
+from menu.forms import CategoryModelForm, FoodItemModelForm
 from menu.models import CategoryModel, FoodItemModel
 from vendor.forms import VendorForm
 from vendor.models import Vendor
@@ -59,7 +59,7 @@ def vendorRegisterView(request):
             send_verification_email(request, user, mail_subject, email_template_url)
 
             
-            messages.success(request, "Your Restaurant has been registered !!")
+            messages.success(request, "Your Restaurant has been registered ! Verification link is send on mail !")
             return redirect('vendor:vendorRegister')
         else:
             messages.error(request, "Please check for the the errors !!")
@@ -131,6 +131,8 @@ def menuBuilderCategory(request, pk=None):
 
 
 # Categoru CRUD
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
 def addCategory(request):
     if request.method == 'POST':
         category_form = CategoryModelForm(request.POST)
@@ -155,6 +157,8 @@ def addCategory(request):
     return render(request, 'vendor/addCategory.html', context)
 
 
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
 def editCategory(request,pk=None):
     
     category_instance = get_object_or_404(CategoryModel,pk=pk)
@@ -184,9 +188,77 @@ def editCategory(request,pk=None):
     }
     return render(request, 'vendor/editCategory.html', context)
 
-
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
 def deleteCategory(request, pk=None):
     category_instance = get_object_or_404(CategoryModel, pk=pk)
     category_instance.delete()
     messages.success(request, "Category was deleted successfuly!")
     return redirect('vendor:menuBuilder')
+
+
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
+def addFood(request):
+    if request.method == 'POST':
+        food_form = FoodItemModelForm(request.POST, request.FILES)
+        if food_form.is_valid():
+            food_title = food_form.cleaned_data['food_title']
+            food = food_form.save(commit=False)
+            food.vendor = get_vendor(request)
+            food.slug = slugify(food_title)
+            food.save()
+            #category_form.save()
+            messages.success(request, "Food Item Added Successfully")
+            return redirect('vendor:menuBuilderCategory',food.category.pk)
+        else:
+            messages.error(request, "Could not add the Food Item!")
+    else:
+        #category_form = CategoryModelForm()
+        food_form = FoodItemModelForm()
+        # modify the form so that it only print the 
+        # categories of the logged in vendor
+        food_form.fields['category'].queryset = CategoryModel.objects.filter(vendor=get_vendor(request))
+    context = {
+        'food_form':food_form,
+    }
+    return render(request, 'vendor/food/addFood.html', context)
+
+
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
+def editFood(request, pk=None):
+    food_instance = get_object_or_404(FoodItemModel,pk=pk)
+    
+    if request.method == 'POST':
+        # The category instance should be passed into the 
+        # form to recognise what it is editing
+        food_form = FoodItemModelForm(request.POST, request.FILES,  instance=food_instance)
+        if food_form.is_valid():
+            food_title = food_form.cleaned_data['food_title']
+            food = food_form.save(commit=False)
+            food.vendor = get_vendor(request)
+            food.slug = slugify(food_title)
+            food.save()
+            #category_form.save()
+            messages.success(request, "Food Item Updated Successfully")
+            return redirect('vendor:menuBuilderCategory',food.category.pk)
+        else:
+            messages.error(request, "Could not Update the Food Item!")
+    else:
+        food_form = FoodItemModelForm(instance=food_instance)
+        food_form.fields['category'].queryset = CategoryModel.objects.filter(vendor=get_vendor(request))
+    
+    context = {
+        'food_form':food_form,
+        'food':food_instance
+    }
+    return render(request, 'vendor/food/editFood.html', context)
+
+@login_required(login_url='accounts:userLogin')
+@user_passes_test(check_restaurant_access)
+def deleteFood(request, pk=None):
+    food_instance = get_object_or_404(FoodItemModel,pk=pk)
+    food_instance.delete()
+    messages.success(request, "Food Item was deleted successfuly!")
+    return redirect('vendor:menuBuilderCategory',food_instance.category.pk)

@@ -23,7 +23,13 @@ urlpatterns = [
     path('menuBuilder/category/add', views.addCategory, name='addCategory'),
     path('menuBuilder/category/edit/<int:pk>/', views.editCategory, name='editCategory'),
     path('menuBuilder/category/delete/<int:pk>/', views.deleteCategory, name='deleteCategory'),
+
+    # Food Item CRUD Edit and delete Category
+    path('menuBuilder/food/add', views.addFood, name='addFood'),
+    path('menuBuilder/food/edit/<int:pk>/', views.editFood, name='editFood'),
+    path('menuBuilder/food/delete/<int:pk>/', views.deleteFood, name='deleteFood'),
     
+
 ]
 
 
