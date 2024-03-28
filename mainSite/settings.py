@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'accounts',
     'vendor',
     'menu',
+    'marketplace',
 ]
 
 MIDDLEWARE = [
@@ -75,6 +76,11 @@ TEMPLATES = [
                 'accounts.context_processors.get_restaurant',
                 # this is for Google api key
                 'accounts.context_processors.get_google_api_key',
+                # To add our own context for cart counter
+                # This is present in all templates now the value
+                'marketplace.context_processors.get_cart_counter',
+                # This is to get the cart total vlaue
+                'marketplace.context_processors.get_cart_amount',
             ],
         },
     },
@@ -155,6 +161,8 @@ MESSAGE_TAGS = {
 }
 
 
+# Logout redirect url for admin page
+LOGOUT_REDIRECT_URL = '/accounts/userLogin/'
 
 
 

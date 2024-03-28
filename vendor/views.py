@@ -49,6 +49,8 @@ def vendorRegisterView(request):
             vendor = vendor_form.save(commit=False)
             # now assign User and Userprofile to vendor model
             vendor.user = user
+            vendor_name = vendor_form.cleaned_data['vendor_name']
+            vendor.vendor_slug = slugify(vendor_name)+"-"+ str(user.pk)
             user_profile = UserProfile.objects.get(user=user)
             vendor.user_profile = user_profile
             vendor.save()

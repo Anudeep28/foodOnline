@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 from accounts.models import User, UserProfile
 from accounts.utils import send_notification
@@ -10,6 +11,8 @@ class Vendor(models.Model):
     user_profile = models.OneToOneField(UserProfile, related_name="userprofile", on_delete=models.CASCADE)
 
     vendor_name = models.CharField(max_length=20)
+
+    vendor_slug = models.SlugField(max_length=100, unique=True)
 
     vendor_lincense = models.ImageField(upload_to='vendor/license')
 

@@ -69,3 +69,156 @@ function onPlaceChanged (){
 
         }
 }
+
+
+/////////////////////////////////// This for the Cart Functionality ///////////////////////////
+$(document).ready(function(){
+    
+    // add to cart
+    $('.add_cart').on('click', function(e){
+        e.preventDefault();
+        food_id = $(this).attr('data-id');
+        url = $(this).attr('data-url');
+        
+        
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success:function(response){
+                console.log(response)
+                if (response.status == 'login_required') {
+                    swal(response.message, "", "info").then(function() {
+                        window.location = '/accounts/userLogin/';
+                        
+                    })
+                }else if (response.status == 'Failed') {
+                    swal(response.message, "", "error")
+                }else{
+                    $('#cart_counter').html(response.cart_count['cart_count']);
+                    $('#qty-'+food_id).html(response.quantity);
+
+                    // Subtotal and Total
+                    applyCartAmount(response.cart_amount['subtotal'], 
+                                    response.cart_amount['tax'], 
+                                    response.cart_amount['grand_total']);
+                }
+                
+            }
+        })
+    })
+
+
+    // Place the cart item quantities on load
+    $('.item-qty').each(function(){
+        var the_id = $(this).attr('id')
+        var quantity = $(this).attr('data-qty')
+        $('#'+the_id).html(quantity)
+    })
+
+    // decrease the cart
+    $('.decrease_cart').on('click', function(e){
+        e.preventDefault();
+        food_id = $(this).attr('data-id');
+        url = $(this).attr('data-url');
+        cart_id = $(this).attr('id');
+        
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success:function(response){
+                console.log(response)
+                if (response.status == 'login_required') {
+                    swal(response.message, "", "info").then(function(){
+                        window.location = '/accounts/userLogin/';
+                        
+                    })
+                }else if (response.status == 'Failed') {
+                    swal(response.message, "", "error")
+                }else{
+                    $('#cart_counter').html(response.cart_count['cart_count']);
+                    $('#qty-'+food_id).html(response.quantity);
+                    // The path should always be th eexact
+                    if (window.location.pathname == '/marketplace/cartView/'){
+                    removeCartItem(response.quantity, cart_id);
+                    checkEmptyCart();
+                    // Subtotal and Total
+                    applyCartAmount(response.cart_amount['subtotal'], 
+                                    response.cart_amount['tax'], 
+                                    response.cart_amount['grand_total']);
+                    }
+                    
+                }
+                
+            }
+                
+        })
+    })
+
+
+
+
+    // Delete the cart
+    $('.delete_cart').on('click', function(e){
+        e.preventDefault();
+        cart_id = $(this).attr('data-id');
+        url = $(this).attr('data-url');
+        
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success:function(response){
+                console.log(response)
+                if (response.status == 'Failed') {
+                    swal(response.message, "", "error")
+                }else{
+                    $('#cart_counter').html(response.cart_count['cart_count']);
+                    
+                    swal(response.status, response.message, 'success')
+                    
+                    
+
+                    removeCartItem(0, cart_id);
+                    checkEmptyCart()
+                    
+                    // Subtotal and Total
+                    applyCartAmount(response.cart_amount['subtotal'], 
+                    response.cart_amount['tax'], 
+                    response.cart_amount['grand_total']);
+                    //removeCartItem(0, cart_id);
+                }
+                }
+                
+        })
+    })
+
+    // delete the cart item if quantity is zero
+    function removeCartItem(cartItemQty, cart_id){
+        
+            if(cartItemQty <= 0){
+                document.getElementById("cart-item-"+cart_id).remove()
+            }
+        
+        
+    }
+
+    // Check if the cart is empty
+    function checkEmptyCart(){
+        var cart_count = document.getElementById('cart_counter').innerHTML
+        if (cart_count == 0){
+            document.getElementById('empty-cart').style.display = "block";
+        }
+    }
+
+    
+
+    // Apply cart amounts 
+    function applyCartAmount(subtotal, tax, grand_total){
+         // this should be only run whe th user is in cart menu
+        if (window.location.pathname == '/marketplace/cartView/'){
+            $('#subtotal').html(subtotal)
+            $('#tax').html(tax)
+            $('#total').html(grand_total)
+        }
+        
+    }
+});
