@@ -1,6 +1,9 @@
+from typing import Iterable
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+# this import is for Location field
+from django.contrib.gis.db import models as gismodels
+from django.contrib.gis.geos import Point
 # Create your models here.
 
 # BASEUSERMANAGER allow sto Edit how the users are created 
@@ -109,12 +112,22 @@ class UserProfile(models.Model):
     pincode = models.CharField(max_length=6, blank=True, null=True)
     longitude = models.CharField(max_length=20, blank=True, null=True)
     latitude = models.CharField(max_length=20, blank=True, null=True)
+    location = gismodels.PointField(blank=True, null=True, srid=4326)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.user.first_name
     
+
+    # Overwriting save method
+    def save(self, *args, **kwargs):
+        if self.latitude and self.longitude:
+            # creating point from long and lat
+            self.location = Point(float(self.longitude), float(self.latitude))
+            return super(UserProfile, self).save(*args, **kwargs)
+        return super(UserProfile, self).save(*args, **kwargs)
+        
     # to get the full adress\
     # def full_address(self):
     #     return self.address

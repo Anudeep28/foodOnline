@@ -1,17 +1,22 @@
 from ast import Delete
+from turtle import distance
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
+import marketplace
 from marketplace.context_processors import get_cart_amount, get_cart_counter
 from marketplace.models import cartModel
 from menu.models import CategoryModel, FoodItemModel
 from vendor.models import Vendor
-
+from django.db.models import Q
 # Reverse fetch
 from django.db.models import Prefetch
 # decorator
 from django.contrib.auth.decorators import login_required
-
+# for location query
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D  # ``D`` is a shortcut for ``Distance``
+from django.contrib.gis.db.models.functions import Distance
 # Create your views here.
 
 
@@ -26,6 +31,66 @@ def marketPlaceView(request):
         "vendors_count":vendors_count
     }
     return render(request, 'marketplace/listings.html', context)
+
+
+
+def restaurantSearch(request):
+    # if the path is not present in the webapp
+    if not 'address' in request.GET:
+        return redirect('home')
+    else:
+        # This is how get the information from html tag through trquest
+        address = request.GET['address']
+        latitude = request.GET['lat']
+        longitude = request.GET['long']
+        keyword = request.GET['keyword']
+        radius = request.GET['radius']
+
+        # Get vendor ids those have food items in it the use ris looking for
+        fetch_restaurants_by_food_items = FoodItemModel.objects.filter(food_title__icontains=keyword, is_available=True).values_list('vendor', flat=True)
+        vendors = Vendor.objects.filter(Q(pk__in=fetch_restaurants_by_food_items) | Q(vendor_name__icontains=keyword, 
+                                                                                    is_approved=True, 
+                                                                                    user__is_active=True))
+        
+        # Location based
+        if latitude and longitude:
+            # Distances will be calculated from this point, which does not have to be projected.
+            pnt = GEOSGeometry("POINT(%s %s)" %(longitude, latitude))
+            vendors = Vendor.objects.filter(Q(pk__in=fetch_restaurants_by_food_items) | Q(vendor_name__icontains=keyword, 
+                                                                                    is_approved=True, 
+                                                                                    user__is_active=True), 
+                                                                                    user_profile__location__distance_lte=(pnt,D(km=radius))).\
+                                                                                        annotate(distance=Distance("user_profile__location", pnt)).order_by("distance")
+            # THis is for to know from where to where 
+            # how much is th edistance between the search points 
+            for v in vendors:
+                v.kms = round(v.distance.km, 1)
+        else:
+            vendors = Vendor.objects.filter(Q(pk__in=fetch_restaurants_by_food_items) | Q(vendor_name__icontains=keyword, 
+                                                                                    is_approved=True, 
+                                                                                    user__is_active=True))
+        
+
+        
+        
+
+        
+            # If numeric parameter, units of field (meters in this case) are assumed.
+            #qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, 7000))
+            # Find all Cities within 7 km, > 20 miles away, and > 100 chains away (an obscure unit)
+            #qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, D(km=7)))
+        # As per restaurant
+        #vendors = Vendor.objects.filter(vendor_name__icontains=keyword, is_approved=True, user__is_active=True)
+        vendors_count = vendors.count()
+        
+        #print(fetch_restaurants_by_food_items, vendors)
+        context = {
+            'vendors':vendors,
+            'vendors_count':vendors_count,
+            'source_location':address
+        }
+
+        return render(request, 'marketplace/listings.html', context)
 
 
 def restaurantMenu(request, vendor_slug):

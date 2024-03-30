@@ -29,5 +29,8 @@ urlpatterns = [
     path('marketplace/', include('marketplace.urls', namespace='marketplace')),
 
     # Home page of the app
-    path('', views.HomePageView, name='home')
+    path('', views.HomePageView, name='home'),
+
+    
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

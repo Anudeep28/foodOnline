@@ -22,3 +22,7 @@
     font-size: 0.75em;
     cursor: pointer;
 }
+
+.main-search.fancy .field-holder input[type="text"] {
+    color: #000000 !important;
+}

@@ -9,7 +9,8 @@ urlpatterns = [
     # Initial page
     path('', views.marketPlaceView, name='marketPlaceView'),
 
-    
+    # Search Path restaurant
+    path('restaurantSearch/', views.restaurantSearch, name='restaurantSearch'), # type: ignore
 
     # Menu
     path('menu/<slug:vendor_slug>/', views.restaurantMenu, name='restaurantMenu'),

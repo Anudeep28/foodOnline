@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 # to store env variable
 from decouple import config
@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'vendor',
     'menu',
     'marketplace',
+
+    # Location field 
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +97,9 @@ WSGI_APPLICATION = 'mainSite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        # commenting out to use postgis
+        #'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': config('DB_NAME'),#'foodonline_db',
         'USER':config('DB_USER'),#'postgres',
         'PASSWORD':config('DB_PASSWORD'),#'Onepiece@28',
@@ -179,3 +184,10 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')#'Eneru Technologies <eneru_sol
 
 # Adding Google maps api keys
 GOOGLE_API_KEY=config('GOOGLE_API_KEY')
+
+
+
+# GDAL services
+os.environ['PATH'] = os.path.join(BASE_DIR, 'myenv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
+os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'myenv\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
+GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'myenv\Lib\site-packages\osgeo\gdal304.dll')
