@@ -93,9 +93,9 @@ HomePage
 									<li class="has-border">
 										<figure>
 											{% if vendor.user_profile.profile_picture %}
-											<a href="#"><img src="{{vendor.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt=""></a>
+											<a href="{% url 'marketplace:restaurantMenu' vendor.vendor_slug %}"><img src="{{vendor.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt=""></a>
 											{% else %}
-											<a href="#"><img src="{% static 'images/default-profile.png' %}" class="attachment-full size-full wp-post-image" alt=""></a>
+											<a href="{% url 'marketplace:restaurantMenu' vendor.vendor_slug %}"><img src="{% static 'images/default-profile.png' %}" class="attachment-full size-full wp-post-image" alt=""></a>
 											{% endif %}
 										</figure>
 									</li>
@@ -125,7 +125,7 @@ HomePage
 										<div class="list-post featured">
 											<div class="img-holder">
 												<figure>
-													<a href="#">
+													<a href="{% url 'marketplace:restaurantMenu' vendor.vendor_slug %}">
 														{% if vendor.user_profile.profile_picture %}
 														<img src="{{vendor.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="">
 														{% else %}
@@ -133,9 +133,15 @@ HomePage
 														{% endif %}
 													</a>
 												</figure>
+												{% if vendor.is_approved %}
+												<span class="restaurant-status open">
+													<em class="bookmarkRibbon"></em>Open
+												</span>
+												{% else %}
 												<span class="restaurant-status close">
 													<em class="bookmarkRibbon"></em>Close
 												</span>
+												{% endif %}
 											</div>
 											<div class="text-holder">
 												<div class="list-rating">
@@ -146,7 +152,7 @@ HomePage
 												</div>
 												<div class="post-title">
 													<h5>
-														<a href="listing-detail.html">{{vendor.vendor_name}}</a>
+														<a href="{% url 'marketplace:restaurantMenu' vendor.vendor_slug %}">{{vendor.vendor_name}}</a>
 														<span class="sponsored text-color">Sponsored</span>
 													</h5>
 												</div>
@@ -155,6 +161,17 @@ HomePage
 													
 														{{vendor.user_profile.city}}, {{vendor.user_profile.state}}, {{vendor.user_profile.pincode}}
 													
+												</span>
+												{% endif %}
+
+												{% if vendor.kms %}
+												<br>
+												<span>
+													<small>
+														<b>
+															{{vendor.kms}} km
+														</b> away
+													</small>
 												</span>
 												{% endif %}
 											</div>
