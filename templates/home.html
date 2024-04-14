@@ -133,7 +133,7 @@ HomePage
 														{% endif %}
 													</a>
 												</figure>
-												{% if vendor.is_approved %}
+												{% if vendor.is_approved and vendor.is_open %}
 												<span class="restaurant-status open">
 													<em class="bookmarkRibbon"></em>Open
 												</span>

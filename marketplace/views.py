@@ -1,4 +1,5 @@
 from ast import Delete
+from datetime import date, datetime
 from turtle import distance
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -7,7 +8,8 @@ import marketplace
 from marketplace.context_processors import get_cart_amount, get_cart_counter
 from marketplace.models import cartModel
 from menu.models import CategoryModel, FoodItemModel
-from vendor.models import Vendor
+import vendor
+from vendor.models import Vendor, openingHoursModel
 from django.db.models import Q
 # Reverse fetch
 from django.db.models import Prefetch
@@ -103,6 +105,15 @@ def restaurantMenu(request, vendor_slug):
             queryset=FoodItemModel.objects.filter(is_available=True)
         )
     )
+
+    # importing the opening hours models for viewing in html
+    opening_hours = openingHoursModel.objects.filter(vendor=restaurant).order_by('day','-from_hours')
+    # Check current day openign hours
+    todays_date = date.today()
+    # returns weeek no
+    today = todays_date.isoweekday()
+    current_opening_hours = openingHoursModel.objects.filter(vendor=restaurant, day = today)
+    
     # To get the cart details of the user
     if request.user.is_authenticated:
         cart_items = cartModel.objects.filter(user=request.user)
@@ -114,7 +125,9 @@ def restaurantMenu(request, vendor_slug):
     context = {
         "restaurant":restaurant,
         "categories":categories,
-        "cart_items":cart_items
+        "cart_items":cart_items,
+        'opening_hours':opening_hours,
+        'current_opening_hours':current_opening_hours,
     }
 
     return render(request, 'marketplace/restaurantMenu.html', context)
