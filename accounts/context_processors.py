@@ -1,4 +1,5 @@
 from django.conf import settings
+from accounts.models import UserProfile
 from vendor.models import Vendor
 
 
@@ -8,6 +9,13 @@ def get_restaurant(request):
     except:
         restaurant = None
     return dict(restaurant=restaurant)
+
+def get_customer_profile(request):
+    try:
+        customer_profile = UserProfile.objects.get(user=request.user)
+    except:
+        customer_profile = None
+    return dict(customer_profile=customer_profile)
 
 
 # In the template the key is not accessible

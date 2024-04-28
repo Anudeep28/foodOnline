@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'vendor',
     'menu',
     'marketplace',
+    'customers',
 
     # Location field 
     'django.contrib.gis',
@@ -77,6 +78,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 # To add our own context for all html pages
                 'accounts.context_processors.get_restaurant',
+                # Customer profile context processor
+                'accounts.context_processors.get_customer_profile',
                 # this is for Google api key
                 'accounts.context_processors.get_google_api_key',
                 # To add our own context for cart counter
