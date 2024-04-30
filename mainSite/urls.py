@@ -28,7 +28,7 @@ urlpatterns = [
     path('vendor/', include('vendor.urls', namespace='vendor')),
     path('marketplace/', include('marketplace.urls', namespace='marketplace')),
     path('customers/', include('customers.urls', namespace='customers')),
-    path('checkout/', include('orders.urls', namespace='orders')),
+    path('orders/', include('orders.urls', namespace='orders')),
     
 
     # Home page of the app

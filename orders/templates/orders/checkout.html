@@ -24,7 +24,7 @@
 												
 												<div id="menu-item-list-6272" class="menu-itam-list">
 													
-													<form action="#" method="POST" enctype="multipart/form-data">
+													<form action="{% url 'orders:placeOrder' %}" method="POST" enctype="multipart/form-data">
                                                         {% csrf_token %}
                                                         <div class="row">
                                                             <div class="form-group col-md-6 col-sm-12 col-lg-6">
@@ -89,7 +89,7 @@
 												<div id="menu-item-list-6272" class="menu-itam-list">
 
 													<ul>
-														{% if cart_items %}
+														
 															{% for item in cart_items %}
 															<li id="cart-item-{{item.pk}}" >
 																<div class="image-holder"> 
@@ -116,14 +116,11 @@
 																</div>
 															</li>
 															{% endfor %}
-														{% else %}
-														<div class="text-center p-5">
-															<h3>Cart is Empty</h3>
-														</div>
-														{% endif %}
+														
 													</ul>
 													
 												</div>
+												<hr>
 												<div>
 													<ul>
 														<li style="list-style-type: none;" >
@@ -151,7 +148,24 @@
 																<span id="total">{{grand_total}}</span>
 															</span>
 														</li>
-														<button type="submit" class="btn btn-danger w-100 p-2 mt-3">Place Order</button>
+														<hr>
+														<!--Select Payment Method-->
+														<h5>Select Payment Method</h5>
+														<div class="payment-method">
+															<label>
+																<input type="radio" name="payment_method" value="PayPal">
+																<img src="{% static 'images/PayPal.png' %}" alt="PayPal" width="100">
+															</label>
+															&emsp;
+															<label>
+																<input type="radio" name="payment_method" value="RazorPay">
+																<img src="{% static 'images/razorpay_logo.png' %}" alt="RazorPay" width="100">
+															</label>
+														</div>
+														<span class="text-danger" id="pay-method-error">
+
+														</span>
+														<button onclick="return paymentMethodConfirm();" type="submit" class="btn btn-danger w-100 p-2 mt-3">Place Order</button>
 													</ul>
                                                 </form>
 												</div>
@@ -167,4 +181,26 @@
 				</div>
 			</div>
 			<!-- Main Section End -->
+<script>
+	function paymentMethodConfirm(){
+		var paymethod = $("input[name='payment_method']:checked").val()
+		if(!paymethod){
+			$('#pay-method-error').html("Select any Payment Method");
+			return false;
+		}else{
+			var conf = confirm("You have selected "+paymethod+" as your preferred payment method.\n Click 'OK' to continue.");
+			if(conf == true){
+				return true;
+			}else{
+				return false;
+			}
+
+		}
+		
+	}
+
+	$('input[name=payment_method]').on('change', function(){
+		$('#pay-method-error').html("");
+	})
+</script>
 {% endblock content %}

@@ -7,7 +7,9 @@ app_name='orders'
 
 urlpatterns = [
 
-    # Initial page
-    path('', views.checkoutView, name='checkout'),
+    # checkout page
+    path('checkout/', views.checkoutView, name='checkout'),
+    # Place order page after checkout
+    path('placeOrder/', views.placeOrderView, name='placeOrder')
 
 ]
