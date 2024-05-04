@@ -274,7 +274,8 @@ $(document).ready(function(){
                         document.getElementById('opening_hours').reset(); 
                         
                     } else {
-                        swal(response.message,'','error')
+                        swal(respo
+                            nse.message,'','error')
                     }
                 }
             })

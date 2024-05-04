@@ -83,6 +83,8 @@ TEMPLATES = [
                 'accounts.context_processors.get_customer_profile',
                 # this is for Google api key
                 'accounts.context_processors.get_google_api_key',
+                # this is for Google api key
+                'accounts.context_processors.get_paypal_api_key',
                 # To add our own context for cart counter
                 # This is present in all templates now the value
                 'marketplace.context_processors.get_cart_counter',
@@ -195,3 +197,10 @@ GOOGLE_API_KEY=config('GOOGLE_API_KEY')
 os.environ['PATH'] = os.path.join(BASE_DIR, 'myenv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
 os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'myenv\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
 GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'myenv\Lib\site-packages\osgeo\gdal304.dll')
+
+
+# For paypal gateways
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
+
+# to securing cross origins
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
