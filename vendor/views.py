@@ -39,7 +39,7 @@ def vendorRegisterView(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             phone_number = form.cleaned_data['phone_number']
-            user = User.objects.create_user(first_name=first_name,
+            user = User.objects.create_user(first_name=first_name, # type: ignore
                                             last_name=last_name,
                                             username = username,
                                             email=email,
@@ -302,7 +302,7 @@ def addOpeningHours(request):
                     if day.is_closed:
                         response = {
                             'status':'success',
-                            'day':day.get_day_display(),
+                            'day':day.get_day_display(), # type: ignore
                             'is_closed':'Closed',
                             'id':hour.pk
                         }
@@ -310,7 +310,7 @@ def addOpeningHours(request):
                     else:
                         response = {
                             'status':'success',
-                            'day':day.get_day_display(),
+                            'day':day.get_day_display(), # type: ignore
                             'from_hour':hour.from_hours,
                             'to_hour':hour.to_hours,
                             'id':hour.pk

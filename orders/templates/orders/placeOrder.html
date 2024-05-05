@@ -12,7 +12,7 @@
 					<div class="container">
 						<div class="row">
 
-							<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+							<div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
 								<div class="tabs-holder horizontal">
 									<ul class="stickynav-tabs nav nav-tabs">
 										<li class="active"><a data-toggle="tab" href="#home"><i class="fa fa-shopping-cart"></i>Review your Billing Address</a></li>
@@ -71,7 +71,7 @@
 								</div>
 							</div>
 							<!--Ypur Order Section here -->
-                            <div class="col-lg-4 col-md-4 col-sm-8 col-xs-12">
+                            <div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
 								<div class="tabs-holder horizontal">
 									<ul class="stickynav-tabs nav nav-tabs">
 										<li class="active"><a data-toggle="tab" href="#home"><i class="icon- icon-room_service"></i>Your Order</a></li>
@@ -166,6 +166,7 @@
     var grandTotal = "{{ grand_total }}";
 	var url = "{% url 'orders:payments' %}"
 	var order_number = "{{order.order_number}}"
+	var order_complete = "{% url 'orders:completed' %}"
 	const csrftoken = getCookie('csrftoken');
     // Render the PayPal button into #paypal-button-container
     paypal.Buttons({
@@ -193,6 +194,9 @@
  
 				sendTransaction(transactionId, payment_method, status);
                 // Display a success message or perform additional actions
+				const element = document.getElementById('paypal-button-container');
+				element.innerHTML = '';
+				element.innerHTML = '<h4 class="text-center"><i class="fa fa-spinner fa-spin"></i>Please wait......</h4>'
                 // alert('Transaction completed by ' + orderData.payer.name.given_name);
             });
         }
@@ -212,6 +216,7 @@
 			},
 			success: function(response){
 				console.log('response==>', response)
+				window.location.href = order_complete + '?order_no='+response.order_number+'&trans_id='+response.transaction_id
 			}
 		})
 	}

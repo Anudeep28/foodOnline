@@ -12,6 +12,8 @@ urlpatterns = [
     # Place order page after checkout
     path('placeOrder/', views.placeOrderView, name='placeOrder'),
     # After successful transaction of payment
-    path('payments/', views.paymentsView, name='payments')
+    path('payments/', views.paymentsView, name='payments'),
+    # Order Completed
+    path('orders_completed/', views.orderCompletedView, name='completed')
 
 ]

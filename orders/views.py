@@ -1,8 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import simplejson as json
 from django.shortcuts import redirect, render
 
 from accounts.models import UserProfile
+from accounts.utils import send_notification
 from marketplace.context_processors import get_cart_amount
 from marketplace.models import cartModel
 from orders.forms import OrderModelForm
@@ -43,7 +44,8 @@ def checkoutView(request):
     }
     return render(request, 'orders/checkout.html', context)
 
-
+# Create your views here.
+@login_required(login_url='accounts:userLogin')
 def placeOrderView(request):
     # cart model
     cart_items = cartModel.objects.filter(user=request.user).order_by('created_at')
@@ -94,6 +96,8 @@ def placeOrderView(request):
     
     return render(request,'orders/placeOrder.html')
 
+# Create your views here.
+@login_required(login_url='accounts:userLogin')
 def paymentsView(request):
     # Check if the request is ajax or not
     if request.user.is_authenticated:
@@ -131,10 +135,65 @@ def paymentsView(request):
                 ordered_food.amount = item.food_item.price * item.quantity # type: ignore
                 ordered_food.save()
 
-            return HttpResponse("Saved Ordered Food")
+            
 
 
             # Send order confirmation email to the customer
+            mail_subject = "Thank you for ordering with us."
+            email_template_url = 'orders/order_confirmation_mail.html'
+            context = {
+                'user': request.user,
+                'order':order,
+                'to_email':order.email
+            }
+            send_notification(mail_subject=mail_subject, email_template_url=email_template_url, context=context)
+            #return HttpResponse("Saved Ordered Food")
             # order received email to the vendor
+            mail_subject = "You have received a new Order"
+            email_template_url = 'orders/new_order_received_mail.html'
+            to_emails = []
+            for i in cart_items:
+                if i.food_item.vendor.user.email not in to_emails:
+                    to_emails.append(i.food_item.vendor.user.email)
+            context = {
+                #'user': request.user,
+                'order':order,
+                'to_email':to_emails
+            }
+            send_notification(mail_subject=mail_subject, email_template_url=email_template_url, context=context)
+            
+
+            # Delete the cart items now
+            # cart_items.delete()
+            
+
             # return back to ajax with success or fail
+            response = {
+                'order_number':order_number,
+                'transaction_id': transaction_id,
+                #'payment_method' : payment_method,
+                #'amount' : order.total,
+            }
+            return JsonResponse(response)
     return HttpResponse('Payments View')
+
+def orderCompletedView(request):
+    order_number = request.GET.get('order_no')
+    transaction_id = request.GET.get('trans_id')
+    try:
+        order = OrderModel.objects.get(order_number = order_number, payment__transaction_id = transaction_id, is_ordered = True)
+        ordered_food = OrderedFoodModel.objects.filter(order = order)
+
+        subtotal = 0
+        for item in ordered_food:
+            subtotal += (item.price*item.quantity)
+        tax_data = json.loads(order.tax_data)
+        context = {
+            'order':order,
+            'ordered_food':ordered_food,
+            'subtotal':subtotal,
+            'tax_data':tax_data,
+        }
+        return render(request, 'orders/order_completed.html', context)
+    except:
+        return redirect('home')
