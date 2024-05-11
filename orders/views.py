@@ -13,6 +13,15 @@ from django.contrib.auth.decorators import login_required
 from orders.models import OrderModel, OrderedFoodModel, PaymentModel
 from orders.utils import generate_order_number
 
+# for razorpay setting
+from mainSite.settings import RZP_KEY_ID, RZP_KEY_SECRET
+
+# RazopPay
+import razorpay
+
+# Creating request
+client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
+
 # Create your views here.
 @login_required(login_url='accounts:userLogin')
 def checkoutView(request):
@@ -86,9 +95,20 @@ def placeOrderView(request):
             order.save()
             order.order_number = generate_order_number(order.pk)
             order.save()
+
+            # RAZORPAY PAYMENT GATEWAY
+            data = { "amount": float(order.total)*100,
+                     "currency": "INR",
+                       "receipt": "receipt_"+order.order_number }
+            rzp_order = client.order.create(data=data)
+            rzp_order_id = rzp_order['id']
+            #print(rzp_order)
             context = {
                 'order':order,
-                'cart_items':cart_items
+                'cart_items':cart_items,
+                'rzp_order_id':rzp_order_id,
+                'RZP_KEY_ID':RZP_KEY_ID,
+                'rzp_amount':float(order.total)*100,
             }
             return render(request,'orders/placeOrder.html', context)#redirect('orders:placeOrder')
         else:
@@ -197,3 +217,4 @@ def orderCompletedView(request):
         return render(request, 'orders/order_completed.html', context)
     except:
         return redirect('home')
+    

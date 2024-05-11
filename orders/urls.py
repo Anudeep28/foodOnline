@@ -14,6 +14,7 @@ urlpatterns = [
     # After successful transaction of payment
     path('payments/', views.paymentsView, name='payments'),
     # Order Completed
-    path('orders_completed/', views.orderCompletedView, name='completed')
-
+    path('orders_completed/', views.orderCompletedView, name='completed'),
+    # adding a new url
+    
 ]
