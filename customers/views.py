@@ -6,6 +6,10 @@ from django.contrib import messages
 
 from accounts.forms import UserInfoForm, UserProfileForm
 from accounts.models import UserProfile
+from orders.models import OrderModel, OrderedFoodModel
+
+# Json
+import simplejson as json
 
 # Create your views here.
 @login_required(login_url='accounts:userLogin')
@@ -36,3 +40,33 @@ def customerProfile(request):
         'profile':profile,
     }
     return render(request, 'customers/customerProfile.html', context)
+
+
+def myOrdersView(request):
+    orders = OrderModel.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = {
+        'orders':orders,
+    }
+    return render(request, 'customers/cusMyOrders.html', context)
+
+def OrderDetailsView(request,order_number):
+    try:
+        print('entered order')
+        order = OrderModel.objects.get(order_number=order_number, is_ordered=True)
+        ordered_food = OrderedFoodModel.objects.filter(order=order)
+        subtotal = 0
+        for item in ordered_food:
+            subtotal += (item.price * item.quantity)
+        tax_data = json.loads(order.tax_data)
+        context = {
+            'order':order,
+            'ordered_food':ordered_food,
+            'subtotal':subtotal,
+            'tax_data':tax_data,
+        }
+        
+        return render(request, 'customers/OrderDetailsView.html', context)
+    except:
+        return redirect('accounts:cusDashboard')
+
+    

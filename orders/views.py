@@ -217,4 +217,3 @@ def orderCompletedView(request):
         return render(request, 'orders/order_completed.html', context)
     except:
         return redirect('home')
-    

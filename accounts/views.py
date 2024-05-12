@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from accounts.decorators import check_customer_access, check_restaurant_access
 from accounts.utils import detectUser, send_verification_email
+from orders.models import OrderModel
 from vendor.models import Vendor
 from .forms import CustomUserForm
 from .models import User
@@ -138,7 +139,12 @@ def accountDecider(request):
 @login_required(login_url='accounts:userLogin')
 @user_passes_test(check_customer_access)
 def cusDashboard(request):
-    return render(request, 'accounts/cusDashboard.html')
+    orders = OrderModel.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = {
+        'orders':orders[:5],
+        'orders_count':orders.count(),
+    }
+    return render(request, 'accounts/cusDashboard.html', context)
 
 
 @login_required(login_url='accounts:userLogin')
