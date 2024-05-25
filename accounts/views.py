@@ -150,7 +150,15 @@ def cusDashboard(request):
 @login_required(login_url='accounts:userLogin')
 @user_passes_test(check_restaurant_access)
 def restaurantDashboard(request):
-    return render(request, 'vendor/restaurantDashboard.html')
+    vendor = Vendor.objects.get(user=request.user)
+    orders = OrderModel.objects.filter(vendors__in=[vendor.pk], is_ordered=True).order_by('-created_at')
+    recent_orders = orders[:5]
+    context = {
+        'orders':orders,
+        'orders_count':orders.count(),
+        'recent_orders':recent_orders
+    }
+    return render(request, 'vendor/restaurantDashboard.html', context)
 
 
 

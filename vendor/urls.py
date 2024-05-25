@@ -34,6 +34,9 @@ urlpatterns = [
     path('menuBuilder/food/add', views.addFood, name='addFood'),
     path('menuBuilder/food/edit/<int:pk>/', views.editFood, name='editFood'),
     path('menuBuilder/food/delete/<int:pk>/', views.deleteFood, name='deleteFood'),
+
+    # Order Details view
+    path('orderDetails/<int:order_number>/', views.orderDetailsView, name='orderDetails'),
     
 
 ]

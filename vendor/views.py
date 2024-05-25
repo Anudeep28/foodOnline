@@ -9,6 +9,7 @@ from accounts.models import User, UserProfile
 from accounts.utils import send_verification_email
 from menu.forms import CategoryModelForm, FoodItemModelForm
 from menu.models import CategoryModel, FoodItemModel
+from orders.models import OrderModel, OrderedFoodModel
 from vendor.forms import VendorForm, openingHoursForm
 from vendor.models import Vendor, openingHoursModel
 # decorator
@@ -337,3 +338,16 @@ def deleteOpeningHours(request, pk=None):
             hour = get_object_or_404(openingHoursModel, pk=pk)
             hour.delete()
             return JsonResponse({'status':'success','id':pk})
+        
+
+def orderDetailsView(request, order_number):
+    try:
+        order = OrderModel.objects.get(order_number=order_number, is_ordered=True)
+        ordered_food = OrderedFoodModel.objects.filter(order=order, fooditem__vendor=get_vendor(request))
+        context = {
+            'order':order,
+            'ordered_food':ordered_food
+        }
+    except:
+        return redirect('vendor:restaurant')
+    return render(request, 'vendor/orderDetails.html', context)

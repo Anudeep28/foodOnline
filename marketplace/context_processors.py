@@ -34,7 +34,7 @@ def get_cart_amount(request):
             tax_type = i.tax_type
             tax_perc = i.tax_percentage
             tax_amount = round((tax_perc * subtotal)/100,2)
-            tax_dict[tax_type] = {str(tax_perc):tax_amount}
+            tax_dict[tax_type] = {str(tax_perc):str(tax_amount)}
             tax += tax_amount
         #print(tax)
 

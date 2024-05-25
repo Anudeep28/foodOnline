@@ -5,7 +5,8 @@ from django.shortcuts import redirect, render
 from accounts.models import UserProfile
 from accounts.utils import send_notification
 from marketplace.context_processors import get_cart_amount
-from marketplace.models import cartModel
+from marketplace.models import cartModel, taxModel
+from menu.models import FoodItemModel
 from orders.forms import OrderModelForm
 # decorators
 from django.contrib.auth.decorators import login_required
@@ -18,6 +19,8 @@ from mainSite.settings import RZP_KEY_ID, RZP_KEY_SECRET
 
 # RazopPay
 import razorpay
+
+import vendor
 
 # Creating request
 client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
@@ -61,6 +64,42 @@ def placeOrderView(request):
     cart_count = cart_items.count()
     if cart_count <= 0:
         return redirect('marketplace:marketPlaceView')
+    
+    # extract restaurants unique ID
+    restaurant_id = []
+    for i in cart_items:
+        if i.food_item.vendor.pk not in restaurant_id:
+            restaurant_id.append(i.food_item.vendor.pk)
+
+    # to get the individual fooditem and vendor total
+    get_tax = taxModel.objects.filter(is_active=True)
+    subtotal = 0
+    k = {}
+    total_data = {}
+    for i in cart_items:
+        fooditem = FoodItemModel.objects.get(pk=i.food_item.pk, vendor_id__in=restaurant_id)
+        r_id = fooditem.vendor.pk
+        if r_id in k:
+            subtotal = k[r_id]
+            subtotal += (fooditem.price * i.quantity)
+            k[r_id] = subtotal
+        else:
+            subtotal = (fooditem.price * i.quantity)
+            k[r_id] = subtotal
+        
+        # Calculatae tax dict
+        tax_dict = {}
+        for i in get_tax:
+            tax_type = i.tax_type
+            tax_perc = i.tax_percentage
+            tax_amount = round((tax_perc * subtotal)/100,2)
+            tax_dict[tax_type] = {str(tax_perc):tax_amount}
+        # Construct total data
+        total_data.update({fooditem.vendor.pk:{str(subtotal):str(tax_dict)}})
+
+    # Calculate the tax data
+
+    #print(restaurant_id)
     # now get the subtotal using the context_processor function
     subtotal = get_cart_amount(request)['subtotal']
     total_tax = get_cart_amount(request)['tax']
@@ -89,11 +128,13 @@ def placeOrderView(request):
             order.user = request.user
             order.total = grand_total # type: ignore
             order.tax_data = json.dumps(tax_data)
+            order.total_data = json.dumps(total_data)
             order.total_tax = total_tax # type: ignore
             order.payment_method = request.POST['payment_method']
             #order.order_number = generate_order_number(order.pk)
             order.save()
             order.order_number = generate_order_number(order.pk)
+            order.vendors.add(*restaurant_id)
             order.save()
 
             # RAZORPAY PAYMENT GATEWAY
